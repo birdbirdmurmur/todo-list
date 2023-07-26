@@ -2,6 +2,8 @@ import express from "express";
 import { engine } from "express-handlebars";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
+import methodOverride from "method-override"
+
 import Todo from "./models/todo.js"; // Todo model
 import 'dotenv/config'
 
@@ -23,6 +25,7 @@ db.once('open', () => {
 app.engine('hbs', engine({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(methodOverride('_method'))
 
 // Controller
 app.get('/', (req, res) => {
@@ -60,9 +63,8 @@ app.get('/todos/:id/edit', (req, res) => {
         .catch(error => console.log(error))
 })
 
-app.post('/todos/:id/edit', (req, res) => {
+app.put('/todos/:id', (req, res) => {
     const id = req.params.id
-    // const name = req.body.name
     const { name, isDone } = req.body
     return Todo.findById(id)
         .then(todo => {
@@ -74,7 +76,7 @@ app.post('/todos/:id/edit', (req, res) => {
         .catch(error => console.log(error))
 })
 
-app.post('/todos/:id/delete', (req, res) => {
+app.delete('/todos/:id', (req, res) => {
     const id = req.params.id
     return Todo.findById(id)
         .then(todo => todo.deleteOne())
